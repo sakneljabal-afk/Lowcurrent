@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>لعبة الدودة - Low current</title>
+<style>
+body { background:#ccf2ff; font-family:Tahoma; margin:0; overflow:hidden; display:flex; justify-content:center; align-items:flex-start; height:100vh; }
+#container { display:flex; margin-top:20px; }
+#sidebar-left { width:220px; max-height:90vh; overflow-y:auto; background:#f0f8ff; padding:10px; margin-right:10px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+#sidebar-left h4 { text-align:center; }
+.answered { margin-bottom:6px; padding:4px 6px; background:#d1ffd1; border-radius:4px; }
+#maze-wrapper { position:relative; }
+#header { text-align:center; font-weight:bold; font-size:18px; margin-bottom:10px; }
+#sidebar-right { width:180px; padding:10px; background:#fff0f5; margin-left:10px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); text-align:center; }
+#maze { position:relative; width:500px; height:500px; background:#fff; border:6px solid #2b6fb3; border-radius:12px; }
+.snake-segment { position:absolute; width:20px; height:20px; background:#4CAF50; border-radius:50%; border:2px solid #2E7D32; z-index:10; transition: all 0.05s linear; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; color:white; }
+.snake-head { background:#FF5722; border-color:#D84315; }
+.q-node { position:absolute; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; z-index:5; color:white; font-size:18px; }
+#questionBox { position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.3); width:350px; display:none; z-index:20; }
+#questionBox h3 { font-size:16px; margin-bottom:12px; }
+.choice { background:#ddd; padding:10px; margin:8px; border-radius:8px; cursor:pointer; font-size:14px; }
+.choice:hover { background:#bbb; }
+#winScreen { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,200,0,0.9); color:white; font-size:32px; display:flex; justify-content:center; align-items:center; flex-direction:column; display:none; }
+#snakeLength { font-size:16px; font-weight:bold; color:#4CAF50; margin-top:10px; }
+
+/* تنسيق الموبايل */
+@media only screen and (max-width: 768px) {
+  body { align-items:center; }
+  #container { flex-direction:column; align-items:center; margin-top:5px; width:100%; padding:5px; box-sizing:border-box; }
+  #sidebar-left { width:95%; max-width:none; margin:0 0 10px 0; max-height:120px; font-size:13px; order:1; }
+  #maze-wrapper { order:2; width:100%; display:flex; flex-direction:column; align-items:center; }
+  #header { font-size:14px; padding:5px; margin-bottom:5px; }
+  #maze { width:95vmin; height:95vmin; max-width:500px; max-height:500px; border:4px solid #2b6fb3; }
+  .snake-segment { width:18px; height:18px; font-size:10px; border-width:2px; }
+  .q-node { width:32px; height:32px; font-size:14px; }
+  #sidebar-right { width:95%; max-width:none; margin:10px 0 0 0; font-size:15px; order:3; padding:8px; }
+  #questionBox { width:90%; max-width:500px; padding:20px; }
+  #questionBox h3 { font-size:18px; margin-bottom:15px; line-height:1.5; }
+  .choice { padding:14px 12px; margin:10px 0; font-size:16px; border-radius:10px; line-height:1.4; }
+  #winScreen { font-size:24px; padding:20px; text-align:center; }
+  .answered { font-size:12px; padding:5px 6px; line-height:1.3; }
+  #sidebar-left h4, #sidebar-right h4 { font-size:14px; margin:5px 0; }
+}
+</style>
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="sidebar-left">
+    <h4>الإجابات</h4>
+    <div id="answeredList"></div>
+  </div>
+
+  <div id="maze-wrapper">
+    <div id="header">المرجع في أنظمة التيار الخفيف|الفصل الثامن Fire alarm system 1</div>
+    <div id="maze" id="maze"></div>
+  </div>
+
+  <div id="sidebar-right">
+    <h4>معلومات الجولة</h4>
+    <p id="roundInfo">الجولة: 1</p>
+    <p id="questionInfo">السؤال: 0 / 0</p>
+    <p id="snakeLength">طول الدودة: 3</p>
+  </div>
+</div>
+
+<div id="questionBox">
+  <h3 id="qText"></h3>
+  <div id="choices"></div>
+</div>
+
+<div id="winScreen">
+  🎉 مبروك! أكملت جميع الأسئلة! 🎉
+  <audio id="winSound" src="../media/win.mp3"></audio>
+</div>
+
+<script>
+// ********** الأسئلة **********
+const allQuestions = [
+    // السؤال 1: مكونات مثلث الحريق
+    {
+        q: "ما هي العناصر الثلاثة الأساسية لتكوين الحريق، والمعروفة باسم 'مثلث الحريق'؟",
+        c: [
+            "الضوء، الضغط، الرطوبة.",
+            "الوقود، الأكسجين، الحرارة (O₂ , Fuel , Heat).",
+            "التيار الكهربائي، الأرض، الدخان.",
+            "الماء، الرغوة، ثاني أكسيد الكربون."
+        ],
+        a: 1
+    },
+    // السؤال 2: المراحل الأربعة للحريق
+    {
+        q: "بناءً على التقسيم الوارد في النص، ما هي المراحل الأربعة الأساسية لتطور الحريق؟",
+        c: [
+            "التأسيس، النمو، الاستقرار، الانحدار.",
+            "التمهيدية، التدخين، اللهب، الحرارة.",
+            "الباردة، الساخنة، المتوسطة، النهائية.",
+            "التأين، الكهروضوئية، البصرية، السمعية."
+        ],
+        a: 1
+    },
+    // السؤال 3: المرحلة التي لا تتضمن دخاناً أو لهباً (المرحلة الأولية)
+    {
+        q: "ما هي المرحلة التي تتميز ببدء عملية الانحلال الحراري للمواد مع توليد كميات ضئيلة من الجسيمات، ولكن دون وجود دخان أو لهب مرئي؟",
+        c: [
+            "مرحلة التدخين (Smoking Stage).",
+            "مرحلة الحرارة (Heat Stage).",
+            "المرحلة التمهيدية (Preliminary Stage).",
+            "مرحلة اللهب (Flame Stage)."
+        ],
+        a: 2
+    },
+    // السؤال 4: المرحلة التي يطلق عليها 'الدخان البارد'
+    {
+        q: "في أي مرحلة من مراحل الحريق يظهر تطور لكميات كافية من جسيمات الاحتراق التي يُطلق عليها 'الدخان البارد' (أي لا يُرى اللهب)؟",
+        c: [
+            "المرحلة التمهيدية (Preliminary Stage).",
+            "مرحلة الحرارة (Heat Stage).",
+            "مرحلة اللهب (Flame Stage).",
+            "مرحلة التدخين (Smoking Stage)."
+        ],
+        a: 3
+    },
+    // السؤال 5: المرحلة التي يتم فيها إطلاق إشعاع مرئي
+    {
+        q: "ما هي المرحلة التي يصل فيها التطور إلى نقطة الاشتعال وتظهر جسيمات اللهب، ويصحبها إطلاق إشعاع مرئي؟",
+        c: [
+            "مرحلة التدخين.",
+            "المرحلة الحرارية.",
+            "المرحلة التمهيدية.",
+            "مرحلة اللهب (Flame Stage)."
+        ],
+        a: 3
+    },
+    // السؤال 6: الكاشف الأنسب للمرحلة التمهيدية
+    {
+        q: "أي نوع من الكواشف يتسم بحساسية عالية تجاه الجسيمات الدقيقة في المرحلة التمهيدية للحريق (PRELIMINARY STAGE)؟",
+        c: [
+            "كاشف اللهب.",
+            "كاشف الحرارة الثابتة.",
+            "كاشف الدخان الأيوني (Ionization Detector).",
+            "كاشف الدخان الكهروضوئي (Photoelectric Detector)."
+        ],
+        a: 2
+    },
+    // السؤال 7: مبدأ عمل كاشف الدخان الأيوني
+    {
+        q: "يعتمد مبدأ عمل كاشف الدخان الأيوني على استخدام مصدر مشع (مثل مادة الأمريسيوم) لـ ... داخل غرفة الكاشف؟",
+        c: [
+            "توليد حرارة عالية.",
+            "توليد ضوء مرئي.",
+            "تأيين الهواء لتكوين جسيمات سالبة وموجبة.",
+            "إنتاج تيار كهربائي مباشر."
+        ],
+        a: 2
+    },
+    // السؤال 8: وظيفة التيار الكهربائي في كاشف التأين
+    {
+        q: "في كاشف الدخان الأيوني، ماذا يمثل التيار الكهربائي المستمر بين الصفيحتين الموجبة والسالبة؟",
+        c: [
+            "دليل على ارتفاع درجة الحرارة داخل الغرفة.",
+            "دليل على انخفاض مستوى الأكسجين.",
+            "دليل على الحالة الطبيعية (عدم وجود دخان).",
+            "دليل على وجود لهب مباشر داخل الغرفة."
+        ],
+        a: 2
+    },
+    // السؤال 9: آلية إطلاق الإنذار في كاشف التأين
+    {
+        q: "متى يتم إطلاق الإنذار في كاشف الدخان الأيوني؟",
+        c: [
+            "عندما ترتفع درجة حرارة الغرفة إلى حد معين.",
+            "عندما يقوم الدخان بإعاقة انتقال الإلكترونات بين الصفيحتين ويؤدي إلى انخفاض/توقف التيار.",
+            "عندما يزيد التيار الكهربائي بين الصفيحتين.",
+            "عندما يزيد تركيز الأكسجين داخل الغرفة."
+        ],
+        a: 1
+    },
+    // السؤال 10: مصدر الجسيمات المشعة في كاشف التأين
+    {
+        q: "ما هو المصدر المشع المستخدم عادةً في كواشف التأين لتوليد جسيمات ألفا (Alpha Particles)؟",
+        c: [
+            "الراديوم 226.",
+            "اليورانيوم 235.",
+            "الأمريسيوم 241 (Americium 241).",
+            "السيزيوم 137."
+        ],
+        a: 2
+    }
+];
+
+// ********** المتغيرات **********
+let maze = document.getElementById("maze");
+let speed = 1.5;
+let keys = {};
+let currentQuestion = null;
+let currentRoundQuestions = [];
+let questionNodes = [];
+let roundCounter = 1;
+let remainingQuestions = [...allQuestions];
+let roundSize = 10;
+let answeredCorrectlyFirstTime = new Set();
+let isMoving = true; // للتحكم في حركة الدودة
+
+// الدودة
+let snake = [];
+let snakeSegments = [];
+let direction = {x: 1, y: 0}; // الاتجاه الافتراضي: يمين
+let segmentDistance = 25; // المسافة بين كل نقطة
+
+const correctSound = new Audio('../media/correct.mp3');
+const wrongSound = new Audio('../media/wrong.mp3');
+const winSound = new Audio('../media/win.mp3');
+
+function getRandomColor(){const letters='0123456789ABCDEF';let color='#';for(let i=0;i<6;i++)color+=letters[Math.floor(Math.random()*16)];return color;}
+function shuffle(array){for(let i=array.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}return array;}
+
+// ********** إنشاء الدودة **********
+function createSnake() {
+    // مسح الدودة القديمة
+    snake = [];
+    
+    // حساب المركز بناءً على حجم المتاهة الحالي
+    let centerX = maze.offsetWidth / 2;
+    let centerY = maze.offsetHeight / 2;
+    
+    // إنشاء 3 نقاط في البداية
+    for(let i = 0; i < 3; i++) {
+        snake.push({x: centerX, y: centerY + (i * segmentDistance)});
+    }
+    renderSnake();
+}
+
+function renderSnake() {
+    // حذف النقاط القديمة
+    snakeSegments.forEach(seg => seg.remove());
+    snakeSegments = [];
+    
+    // رسم الدودة
+    snake.forEach((segment, index) => {
+        let seg = document.createElement('div');
+        seg.className = 'snake-segment';
+        if(index === 0) {
+            seg.classList.add('snake-head');
+            // الرأس بدون رقم
+        } else {
+            // باقي الجسم عليه أرقام
+            seg.textContent = index;
+        }
+        seg.style.left = segment.x + 'px';
+        seg.style.top = segment.y + 'px';
+        
+        maze.appendChild(seg);
+        snakeSegments.push(seg);
+    });
+    
+    updateSnakeLength();
+}
+
+function growSnake() {
+    // إضافة نقطة جديدة في آخر الدودة
+    let tail = snake[snake.length - 1];
+    let beforeTail = snake[snake.length - 2];
+    
+    // حساب اتجاه النقطة الجديدة
+    let dx = tail.x - beforeTail.x;
+    let dy = tail.y - beforeTail.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if(distance > 0) {
+        let ratio = segmentDistance / distance;
+        snake.push({
+            x: tail.x + dx * ratio,
+            y: tail.y + dy * ratio
+        });
+    } else {
+        snake.push({x: tail.x, y: tail.y + segmentDistance});
+    }
+    renderSnake();
+}
+
+function shrinkSnake() {
+    // تقصير الدودة (حذف آخر نقطة)
+    if(snake.length > 2) { // نحافظ على نقطتين على الأقل
+        snake.pop();
+        renderSnake();
+    }
+}
+
+function updateSnakeLength() {
+    document.getElementById('snakeLength').textContent = `طول الدودة: ${snake.length}`;
+}
+
+// ********** إنشاء الكور **********
+function createNodes(questions){
+    questionNodes.forEach(n=>n.remove());
+    questionNodes=[];
+    questions.forEach((q)=>{
+        addNode(q);
+    });
+    updateRoundInfo();
+}
+
+function addNode(question){
+    let node = document.createElement('div');
+    node.className='q-node';
+    node.dataset.question=question.q;
+    let nodeNumber = questionNodes.length + 1; // رقم الكرة (1، 2، 3، ...)
+    node.textContent = nodeNumber;
+    
+    // ********** المنطقة المعدلة لترتيب الكور **********
+    let cols = 3; // عدد الأعمدة في المتاهة
+    let rows = Math.ceil(currentRoundQuestions.length / cols); // عدد الصفوف المحسوب
+    
+    let mazeWidth = maze.offsetWidth;
+    let mazeHeight = maze.offsetHeight;
+    let nodeSize = 50; // حجم الكرة (50px كما في CSS)
+    let margin = 40; // هامش لترك مسافة عن الحواف
+
+    // حساب المسافات بالتساوي
+    let stepX = (mazeWidth - 2 * margin) / (cols - 1 || 1);
+    let stepY = (mazeHeight - 2 * margin) / (rows - 1 || 1);
+
+    // حساب موقع الكرة الحالية (الرقم يمثل ترتيبها)
+    let colIndex = (nodeNumber - 1) % cols;
+    let rowIndex = Math.floor((nodeNumber - 1) / cols);
+
+    let x = margin + (colIndex * stepX) - (nodeSize / 2);
+    let y = margin + (rowIndex * stepY) - (nodeSize / 2);
+
+    // التحقق من أن الموقع ضمن الحدود
+    x = Math.max(margin, Math.min(x, mazeWidth - margin - nodeSize));
+    y = Math.max(margin, Math.min(y, mazeHeight - margin - nodeSize));
+    
+    // ********** نهاية المنطقة المعدلة **********
+    
+    node.style.left = x+'px';
+    node.style.top = y+'px';
+    node.style.background = getRandomColor();
+    maze.appendChild(node);
+    questionNodes.push(node);
+}
+// ********** عرض السؤال **********
+function showQuestion(node){
+    if(currentQuestion!==null) return;
+    currentQuestion = node;
+    isMoving = false; // توقف الدودة
+    
+    const qb = document.getElementById("questionBox");
+    qb.style.display="block";
+
+    const qData = currentRoundQuestions.find(q=>q.q===node.dataset.question);
+    document.getElementById("qText").textContent = qData.q;
+
+    const ch = document.getElementById("choices");
+    ch.innerHTML="";
+    let choices = qData.c.map((txt,index)=>({txt,index}));
+    choices = shuffle(choices);
+
+    choices.forEach(choice=>{
+        let d=document.createElement("div");
+        d.className="choice";
+        d.textContent=choice.txt;
+        d.onclick=()=>{
+            if(choice.index===qData.a){
+                correctSound.play();
+
+                // أول مرة صحيحة - تطول الدودة!
+                if(!answeredCorrectlyFirstTime.has(qData.q)){
+                    answeredCorrectlyFirstTime.add(qData.q);
+                    document.getElementById("answeredList").innerHTML+=
+                        `<div class="answered">${qData.q} - الإجابة الصحيحة: ${qData.c[qData.a]}</div>`;
+                    remainingQuestions = remainingQuestions.filter(q=>q.q!==qData.q);
+                    
+                    // تطول الدودة
+                    growSnake();
+                }
+
+                // إزالة كل الكور المرتبطة بالسؤال
+                questionNodes.filter(n=>n.dataset.question===qData.q)
+                             .forEach(n=>n.remove());
+                questionNodes = questionNodes.filter(n=>n.dataset.question!==qData.q);
+
+                currentQuestion = null;
+                isMoving = true; // استئناف الحركة
+                qb.style.display="none";
+                updateRoundInfo();
+
+                if(questionNodes.length===0) startNextRound();
+            } else {
+                wrongSound.play();
+                
+                // تقصير الدودة
+                shrinkSnake();
+                
+                alert("خطأ، حاول مرة أخرى!");
+                // إزالة الكرة الحالية
+                node.remove();
+                questionNodes = questionNodes.filter(n=>n!==node);
+                // إضافة كرة جديدة لنفس السؤال
+                addNode(qData);
+                currentQuestion = null;
+                isMoving = true; // استئناف الحركة
+                qb.style.display="none";
+                updateRoundInfo();
+            }
+        };
+        ch.appendChild(d);
+    });
+}
+
+// ********** التحقق من اللاعب **********
+function checkQuestionNodes(){
+    if(currentQuestion!==null) return;
+    let head = snake[0];
+    questionNodes.forEach(node=>{
+        let nx=node.offsetLeft, ny=node.offsetTop;
+        if(Math.abs(head.x-nx)<40 && Math.abs(head.y-ny)<40){ 
+            showQuestion(node); 
+        }
+    });
+}
+
+// ********** حركة الدودة **********
+// للكمبيوتر: الأسهم
+document.addEventListener('keydown', e=> {
+    e.preventDefault();
+    if(e.key === 'ArrowUp' && direction.y === 0) {
+        direction = {x: 0, y: -1};
+    } else if(e.key === 'ArrowDown' && direction.y === 0) {
+        direction = {x: 0, y: 1};
+    } else if(e.key === 'ArrowLeft' && direction.x === 0) {
+        direction = {x: -1, y: 0};
+    } else if(e.key === 'ArrowRight' && direction.x === 0) {
+        direction = {x: 1, y: 0};
+    }
+});
+
+// للموبايل: السحب (Swipe)
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+}, {passive: true});
+
+function handleSwipe() {
+    let diffX = touchEndX - touchStartX;
+    let diffY = touchEndY - touchStartY;
+    
+    // تحديد الاتجاه الأقوى (أفقي أو رأسي)
+    if(Math.abs(diffX) > Math.abs(diffY)) {
+        // حركة أفقية
+        if(diffX > 20 && direction.x === 0) {
+            // سحب يمين
+            direction = {x: 1, y: 0};
+        } else if(diffX < -20 && direction.x === 0) {
+            // سحب شمال
+            direction = {x: -1, y: 0};
+        }
+    } else {
+        // حركة رأسية
+        if(diffY > 20 && direction.y === 0) {
+            // سحب تحت
+            direction = {x: 0, y: 1};
+        } else if(diffY < -20 && direction.y === 0) {
+            // سحب فوق
+            direction = {x: 0, y: -1};
+        }
+    }
+}
+
+function moveSnake(){
+    if(!isMoving) {
+        requestAnimationFrame(moveSnake);
+        return;
+    }
+    
+    // تحريك الرأس في الاتجاه الحالي
+    let head = snake[0];
+    let newX = head.x + (direction.x * speed);
+    let newY = head.y + (direction.y * speed);
+    
+    // حدود الشاشة - ارتداد (مع أخذ حجم النقطة في الاعتبار)
+    let segmentSize = parseFloat(getComputedStyle(document.querySelector('.snake-segment') || document.createElement('div')).width) || 20;
+    
+    if(newX < segmentSize/2 || newX > maze.offsetWidth - segmentSize/2) {
+        direction.x = -direction.x;
+        newX = Math.max(segmentSize/2, Math.min(maze.offsetWidth - segmentSize/2, newX));
+    }
+    if(newY < segmentSize/2 || newY > maze.offsetHeight - segmentSize/2) {
+        direction.y = -direction.y;
+        newY = Math.max(segmentSize/2, Math.min(maze.offsetHeight - segmentSize/2, newY));
+    }
+    
+    // تحريك الرأس
+    snake[0] = {x: newX, y: newY};
+    
+    // تحديث مواقع باقي النقاط لتتبع الرأس بمسافات ثابتة
+    for(let i = 1; i < snake.length; i++) {
+        let prev = snake[i - 1];
+        let curr = snake[i];
+        
+        let dx = prev.x - curr.x;
+        let dy = prev.y - curr.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if(distance > 0) {
+            let ratio = segmentDistance / distance;
+            snake[i] = {
+                x: prev.x - dx * ratio,
+                y: prev.y - dy * ratio
+            };
+        }
+    }
+    
+    renderSnake();
+    checkQuestionNodes();
+    requestAnimationFrame(moveSnake);
+}
+
+// ********** بدء الجولة التالية **********
+function startNextRound(){
+    if(remainingQuestions.length===0){
+        document.getElementById('winScreen').style.display='flex';
+        winSound.play();
+        return;
+    }
+
+    currentRoundQuestions=[];
+    
+    // التعديل هنا: بدلاً من الخلط، نستخدم الجزء الأول من الأسئلة المتبقية بالترتيب
+    // let shuffled = shuffle([...remainingQuestions]); // <== تم إلغاء الخلط
+    
+    // استخدام الأسئلة المتبقية بالترتيب
+    let questionsToUse = [...remainingQuestions];
+    
+    for(let i=0; i<Math.min(roundSize, questionsToUse.length); i++){
+        // استخدام الأسئلة المرتبة
+        currentRoundQuestions.push({...questionsToUse[i]}); 
+    }
+
+    // إعادة إنشاء الدودة من جديد بحجمها الأصلي
+    createSnake();
+    
+    // التعديل هنا: نمرر الأسئلة المرتبة التي تم اختيارها للجولة
+    createNodes(currentRoundQuestions); 
+    roundCounter++;
+}
+
+// ********** تحديث المعلومات **********
+function updateRoundInfo(){
+    let answeredCount = currentRoundQuestions.filter(q=>answeredCorrectlyFirstTime.has(q.q)).length;
+    document.getElementById("roundInfo").textContent = `الجولة: ${roundCounter}`;
+    document.getElementById("questionInfo").textContent = `السؤال: ${answeredCount} / ${currentRoundQuestions.length}`;
+}
+
+// ********** بدء اللعبة **********
+createSnake();
+startNextRound();
+moveSnake();
+</script>
+</body>
+</html>
