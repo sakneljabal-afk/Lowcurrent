@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>المرجع في أنظمة التيار الخفيف</title>
+<style>
+  body { font-family:Tahoma; background:#ccf2ff; display:flex; flex-direction:column; align-items:center; margin:0; padding:0; }
+  h1 { margin-top:20px; color:#2b6fb3; font-size:28px; text-align:center; padding:0 10px; }
+
+  .units { display:flex; flex-wrap:wrap; justify-content:center; margin-top:30px; position:relative; z-index:2; max-width:1200px; }
+
+  /* البطاقات */
+  .unit-card { width:250px; min-height:100px; margin:10px; background:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); transition:0.3s; text-align:center; flex-direction:column; position:relative; z-index:2; opacity:0; transform:translateY(-20px); user-select:none; -webkit-tap-highlight-color:transparent; }
+  .unit-card.show { opacity:1; transform:translateY(0); transition: all 0.6s ease; }
+
+  .unit-card:hover { transform:scale(1.05); box-shadow:0 6px 10px rgba(0,0,0,0.3); }
+
+  .unit-card.active { box-shadow:0 10px 20px rgba(0,0,0,0.4); transform:scale(1.05); background:#e6f2ff; }
+  .unit-card.active:hover { box-shadow:0 14px 28px rgba(0,0,0,0.5); background:#d0e8ff; }
+
+  /* السهم */
+  .arrow { display:inline-block; margin-top:5px; transition: transform 0.3s ease; }
+
+  /* القوائم */
+  .dropdown { 
+    max-height:0; 
+    overflow:hidden; 
+    transition: max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease; 
+    background:#fff; 
+    border-radius:8px; 
+    box-shadow:0 4px 6px rgba(0,0,0,0.2); 
+    width:100%; 
+    flex-direction:column; 
+    z-index:2; 
+    margin-top:5px;
+    opacity:0;
+    transform:translateY(-10px);
+  }
+
+  .dropdown.show { opacity:1; transform:translateY(0); }
+
+  .dropdown strong {
+    padding:10px;
+    background:#f0f8ff;
+    color:#2b6fb3;
+    border-bottom:2px solid #2b6fb3;
+    display:block;
+    font-size:16px;
+  }
+
+  .dropdown a { 
+    padding:12px; 
+    text-align:center; 
+    text-decoration:none; 
+    color:#2b6fb3; 
+    font-weight:bold; 
+    border-bottom:1px solid #ccc; 
+    transition:0.3s all; 
+    display:block; 
+    font-size:15px;
+  }
+
+  .dropdown a:hover { 
+    background:#ccf2ff; 
+    transform:translateX(5px); 
+  }
+
+  .dropdown a:active {
+    background:#b3e0ff;
+  }
+
+  /* Overlay */
+  .overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.3);
+    display:none;
+    z-index:1;
+  }
+
+  /* تنسيق الموبايل */
+  @media only screen and (max-width: 768px) {
+    h1 { 
+      font-size:22px; 
+      margin-top:15px; 
+    }
+    
+    .units { 
+      margin-top:20px; 
+      padding:0 10px; 
+      width:100%;
+      box-sizing:border-box;
+    }
+    
+    .unit-card { 
+      width:90%; 
+      max-width:400px;
+      margin:10px auto; 
+      font-size:17px; 
+      min-height:90px; 
+      padding:10px;
+    }
+
+    .dropdown strong {
+      font-size:15px;
+      padding:12px;
+    }
+
+    .dropdown a {
+      padding:14px;
+      font-size:16px;
+    }
+
+    .arrow {
+      font-size:14px;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    h1 { 
+      font-size:20px; 
+    }
+    
+    .unit-card { 
+      font-size:16px; 
+      min-height:85px; 
+    }
+
+    .dropdown strong {
+      font-size:14px;
+    }
+
+    .dropdown a {
+      font-size:15px;
+      padding:12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>المرجع في أنظمة التيار الخفيف</h1>
+<div class="units">
+
+  <!-- الوحدة الأولى -->
+  <div class="unit-card" id="unit1Card" onclick="toggleDropdown('unit1Dropdown','unit1Arrow','unit1Card')">
+الفصل الأول data network 
+    <span class="arrow" id="unit1Arrow">▼</span>
+    <div class="dropdown" id="unit1Dropdown">
+
+      <!-- المفهوم الأول -->
+      <strong></strong>
+      <a href="unit1lesson1-1.html">1</a>
+      <a href="unit1lesson1-2.html">2</a>
+      <a href="unit1lesson1-3.html">3</a>
+      <a href="unit1lesson1-4.html">4</a>
+      <a href="unit1lesson1-5.html">5</a>
+      <a href="unit1lesson1-6.html">6</a>
+      <a href="unit1lesson1-7.html">7</a>
+      <a href="unit1lesson1-8.html">8</a>
+      <a href="unit1lesson1-9.html">9</a>
+      <a href="unit1lesson1-10.html">10</a>
+      <a href="unit1lesson1-11.html">11</a>
+      <a href="unit1lesson1-12.html">12</a>
+      <a href="unit1lesson1-13.html">13</a> 
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit2Card" onclick="toggleDropdown('unit2Dropdown','unit2Arrow','unit2Card')">
+الفصل الثاني:BMS 
+    <span class="arrow" id="unit2Arrow">▼</span>
+    <div class="dropdown" id="unit2Dropdown">
+      <!-- المفهوم الثاني -->
+      <strong></strong>
+      <a href="unit2lesson1-1.html">1</a>
+      <a href="unit2lesson1-2.html">2</a>
+      <a href="unit2lesson1-3.html">3</a>
+      <a href="unit2lesson1-4.html">4</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit3Card" onclick="toggleDropdown('unit3Dropdown','unit3Arrow','unit3Card')">
+    الفصل الثالث:أنظمة الهاتف
+    <span class="arrow" id="unit3Arrow">▼</span>
+    <div class="dropdown" id="unit3Dropdown">
+      <!-- المفهوم الثالث -->
+      <strong></strong>
+       <a href="unit3lesson1-1.html">1</a>
+       <a href="unit3lesson1-2.html">2</a>
+       <a href="unit3lesson1-3.html">3</a>
+       <a href="unit3lesson1-4.html">4</a>
+       <a href="unit3lesson1-5.html">5</a>
+       <a href="unit3lesson1-6.html">6</a>
+       <a href="unit3lesson1-7.html">7</a>
+       <a href="unit3lesson1-8.html">8</a>
+
+    </div>
+  </div>
+
+
+  <!-- الوحدة الثالثة -->
+  <div class="unit-card" id="unit4Card" onclick="toggleDropdown('unit4Dropdown','unit4Arrow','unit4Card')">
+الفصل الرابع:SMATV systems
+    <span class="arrow" id="unit4Arrow">▼</span>
+    <div class="dropdown" id="unit4Dropdown">
+      <!-- المفهوم الأول -->
+      <strong></strong>
+      <a href="unit4lesson1-1.html">1</a>
+      <a href="unit4lesson1-2.html">2</a>
+      <a href="unit4lesson1-3.html">3</a>
+      <a href="unit4lesson1-4.html">4</a>
+      <a href="unit4lesson1-5.html">5</a>
+      <a href="unit4lesson1-6.html">6</a>
+      <a href="unit4lesson1-7.html">7</a>
+      <a href="unit4lesson1-8.html">8</a>
+
+    </div>
+  </div>
+  <!--  -->
+  <div class="unit-card" id="unit5Card" onclick="toggleDropdown('unit5Dropdown','unit5Arrow','unit5Card')">
+الفصل الرابع:SMATV systems
+    <span class="arrow" id="unit5Arrow">▼</span>
+    <div class="dropdown" id="unit5Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit4lesson1-9.html">9</a>
+      <a href="unit4lesson1-10.html"10></a>
+      <a href="unit4lesson1-11.html">11</a>
+      <a href="unit4lesson1-12.html">12</a>
+      <a href="unit4lesson1-13.html">13</a>
+      <a href="unit4lesson1-14.html">14</a>
+      <a href="unit4lesson1-15.html">15</a>
+      <a href="unit4lesson1-16.html">16</a>
+    </div>
+  </div>
+
+  <div class="unit-card" id="unit6Card" onclick="toggleDropdown('unit6Dropdown','unit6Arrow','unit6Card')">
+الفصل الخامس: Door control systems
+    <span class="arrow" id="unit6Arrow">▼</span>
+    <div class="dropdown" id="unit6Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit5lesson1-1.html">1</a>
+      <a href="unit5lesson1-2.html">2</a>
+      <a href="unit5lesson1-3.html">3</a>
+      <a href="unit5lesson1-4.html">4</a>
+      <a href="unit5lesson1-5.html">5</a>
+      <a href="unit5lesson1-6.html">6</a>
+      <a href="unit5lesson1-7.html">7</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit7Card" onclick="toggleDropdown('unit7Dropdown','unit7Arrow','unit7Card')">
+الفصل السادس: Nurse call system 
+    <span class="arrow" id="unit7Arrow">▼</span>
+    <div class="dropdown" id="unit7Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit6lesson1-1.html">1</a>
+      <a href="unit6lesson1-2.html">2</a>
+      <a href="unit6lesson1-3.html">3</a>
+      <a href="unit6lesson1-4.html">4</a>
+      <a href="unit6lesson1-5.html">5</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit8Card" onclick="toggleDropdown('unit8Dropdown','unit8Arrow','unit8Card')">
+الفصل السابع:CCTV 
+    <span class="arrow" id="unit8Arrow">▼</span>
+    <div class="dropdown" id="unit8Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit7lesson1-1.html">1</a>
+      <a href="unit7lesson1-2.html">2</a>
+      <a href="unit7lesson1-3.html">3</a>
+      <a href="unit7lesson1-4.html">4</a>
+      <a href="unit7lesson1-5.html">5</a>
+      <a href="unit7lesson1-6.html">6</a>
+      <a href="unit7lesson1-7.html">7</a>
+      <a href="unit7lesson1-8.html">8</a>
+      <a href="unit7lesson1-9.html">9</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit9Card" onclick="toggleDropdown('unit9Dropdown','unit9Arrow','unit9Card')">
+الفصل السابع:CCTV 
+    <span class="arrow" id="unit9Arrow">▼</span>
+    <div class="dropdown" id="unit9Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit7lesson1-10.html">10</a>
+      <a href="unit7lesson1-11.html">11</a>
+      <a href="unit7lesson1-12.html">12</a>
+      <a href="unit7lesson1-13.html">13</a>
+      <a href="unit7lesson1-14.html">14</a>
+      <a href="unit7lesson1-15.html">15</a>
+      <a href="unit7lesson1-16.html">16</a>
+      <a href="unit7lesson1-17.html">17</a>
+      <a href="unit7lesson1-18.html">18</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit10Card" onclick="toggleDropdown('unit10Dropdown','unit10Arrow','unit10Card')">
+الفصل الثامن:Fire alarm system
+    <span class="arrow" id="unit10Arrow">▼</span>
+    <div class="dropdown" id="unit10Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit8lesson1-1.html">1</a>
+      <a href="unit8lesson1-2.html">2</a>
+      <a href="unit8lesson1-3.html">3</a>
+      <a href="unit8lesson1-4.html">4</a>
+      <a href="unit8lesson1-5.html">5</a>
+      <a href="unit8lesson1-6.html">6</a>
+      <a href="unit8lesson1-7.html">7</a>
+      <a href="unit8lesson1-8.html">8</a>
+      <a href="unit8lesson1-9.html">9</a>
+      <a href="unit8lesson1-10.html">10</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit11Card" onclick="toggleDropdown('unit11Dropdown','unit11Arrow','unit11Card')">
+الفصل الثامن:Fire alarm system
+    <span class="arrow" id="unit11Arrow">▼</span>
+    <div class="dropdown" id="unit11Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit8lesson1-11.html">11</a>
+      <a href="unit8lesson1-12.html">12</a>
+      <a href="unit8lesson1-13.html">13</a>
+      <a href="unit8lesson1-14.html">14</a>
+      <a href="unit8lesson1-15.html">15</a>
+      <a href="unit8lesson1-16.html">16</a>
+      <a href="unit8lesson1-17.html">17</a>
+      <a href="unit8lesson1-18.html">18</a>
+      <a href="unit8lesson1-19.html">19</a>
+      <a href="unit8lesson1-20.html">20</a>
+
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit12Card" onclick="toggleDropdown('unit12Dropdown','unit12Arrow','unit12Card')">
+الفصل التاسع: Sound system
+    <span class="arrow" id="unit12Arrow">▼</span>
+    <div class="dropdown" id="unit12Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit9lesson1-1.html">1</a>
+      <a href="unit9lesson1-2.html">2</a>
+      <a href="unit9lesson1-3.html">3</a>
+      <a href="unit9lesson1-4.html">4</a>
+      <a href="unit9lesson1-5.html">5</a>
+      <a href="unit9lesson1-6.html">6</a>
+      <a href="unit9lesson1-7.html">7</a>
+      <a href="unit9lesson1-8.html">8</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit13Card" onclick="toggleDropdown('unit13Dropdown','unit13Arrow','unit13Card')">
+الفصل التاسع: Sound system
+    <span class="arrow" id="unit13Arrow">▼</span>
+    <div class="dropdown" id="unit13Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit9lesson1-9.html">9</a>
+      <a href="unit9lesson1-10.html">10</a>
+      <a href="unit9lesson1-11.html">11</a>
+      <a href="unit9lesson1-12.html">12</a>
+      <a href="unit9lesson1-13.html">13</a>
+      <a href="unit9lesson1-14.html">14</a>
+      <a href="unit9lesson1-15.html">15</a>
+      <a href="unit9lesson1-16.html">16</a>
+
+    </div>
+  </div>
+  <div class="unit-card" id="unit14Card" onclick="toggleDropdown('unit14Dropdown','unit14Arrow','unit14Card')">
+الفصل التاسع: Sound system
+    <span class="arrow" id="unit14Arrow">▼</span>
+    <div class="dropdown" id="unit14Dropdown">
+      <!--   -->
+      <strong></strong>
+      <a href="unit9lesson1-17.html">17</a>
+      <a href="unit9lesson1-18.html">18</a>
+      <a href="unit9lesson1-19.html">19</a>
+      <a href="unit9lesson1-20.html">20</a>
+      <a href="unit9lesson1-21.html">21</a>
+      <a href="unit9lesson1-22.html">22</a>
+      <a href="unit9lesson1-23.html">23</a>
+
+    </div>
+  </div>
+
+
+
+</div>
+<div class="overlay" id="overlay" onclick="closeAllDropdowns()"></div>
+
+<script>
+/* Entry animation عند تحميل الصفحة */
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.unit-card').forEach((card, i) => {
+    setTimeout(() => { card.classList.add('show'); }, i*150);
+  });
+});
+
+/* Toggle القوائم */
+function toggleDropdown(dropdownId, arrowId, cardId) {
+  const allDropdowns = document.querySelectorAll('.dropdown');
+  const allArrows = document.querySelectorAll('.arrow');
+  const allCards = document.querySelectorAll('.unit-card');
+  const overlay = document.getElementById('overlay');
+  let isOpening = false;
+
+  allDropdowns.forEach(dd => {
+    if(dd.id !== dropdownId) {
+      dd.style.maxHeight = null;
+      dd.classList.remove('show');
+    }
+  });
+
+  allArrows.forEach(ar => {
+    if(ar.id !== arrowId) {
+      ar.style.transform = 'rotate(0deg)';
+    }
+  });
+
+  allCards.forEach(cd => {
+    if(cd.id !== cardId) {
+      cd.classList.remove('active');
+    }
+  });
+
+  const dropdown = document.getElementById(dropdownId);
+  const arrow = document.getElementById(arrowId);
+  const card = document.getElementById(cardId);
+
+  if(dropdown.style.maxHeight) {
+    dropdown.style.maxHeight = null;
+    dropdown.classList.remove('show');
+    arrow.style.transform = 'rotate(0deg)';
+    card.classList.remove('active');
+  } else {
+    dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+    dropdown.classList.add('show');
+    arrow.style.transform = 'rotate(180deg)';
+    card.classList.add('active');
+    isOpening = true;
+  }
+
+  overlay.style.display = isOpening ? 'block' : 'none';
+}
+
+/* إغلاق جميع القوائم */
+function closeAllDropdowns() {
+  const allDropdowns = document.querySelectorAll('.dropdown');
+  const allArrows = document.querySelectorAll('.arrow');
+  const allCards = document.querySelectorAll('.unit-card');
+  const overlay = document.getElementById('overlay');
+
+  allDropdowns.forEach(dd => { dd.style.maxHeight = null; dd.classList.remove('show'); });
+  allArrows.forEach(ar => ar.style.transform = 'rotate(0deg)');
+  allCards.forEach(cd => cd.classList.remove('active'));
+  overlay.style.display = 'none';
+}
+</script>
+
+</body>
+</html>
